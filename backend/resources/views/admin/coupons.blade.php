@@ -1,0 +1,8 @@
+@extends('admin.layout')
+@section('title','الكوبونات')
+@section('content')
+<div class="page-heading"><div><p class="eyebrow">عروض محسوبة</p><h1>كوبونات الخصم</h1><p class="muted">يمكن إيقاف الكوبون دون تغيير الطلبات التي استخدمته.</p></div></div>
+@php($fields=['code'=>['label'=>'رمز الكوبون','required'=>true],'discount_type'=>['label'=>'نوع الخصم','options'=>['percentage'=>'نسبة مئوية','fixed'=>'مبلغ ثابت']],'discount_value'=>['label'=>'قيمة الخصم','type'=>'number','step'=>'0.01','min'=>0.01,'required'=>true],'minimum_order'=>['label'=>'الحد الأدنى للطلب','type'=>'number','step'=>'0.01','min'=>0,'default'=>0,'required'=>true],'maximum_discount'=>['label'=>'أقصى خصم (اختياري)','type'=>'number','step'=>'0.01','min'=>0],'usage_limit'=>['label'=>'إجمالي مرات الاستخدام (اختياري)','type'=>'number','min'=>1],'usage_per_customer'=>['label'=>'مرات الاستخدام لكل عميل','type'=>'number','min'=>1,'default'=>1,'required'=>true],'first_order_only'=>['label'=>'للأول طلب فقط','options'=>[0=>'لا',1=>'نعم'],'default'=>0],'starts_at'=>['label'=>'بداية الصلاحية','type'=>'datetime-local'],'expires_at'=>['label'=>'نهاية الصلاحية','type'=>'datetime-local'],'is_active'=>['label'=>'الحالة','options'=>[1=>'فعال',0=>'موقوف'],'default'=>1]])
+@foreach($coupons->concat([new \App\Models\Coupon]) as $record)<section class="panel"><details @if(!$record->exists) open @endif><summary>{{ $record->code??'＋ إضافة كوبون' }} @if($record->exists)<span class="badge">{{ $record->is_active?'فعال':'موقوف' }} · {{ $record->orders_count }} استخدام</span>@endif</summary>@include('admin.record-form',['action'=>route('admin.coupons.save',$record->id),'formKey'=>'coupon-'.($record->id??'new')])</details></section>@endforeach
+@endsection
+

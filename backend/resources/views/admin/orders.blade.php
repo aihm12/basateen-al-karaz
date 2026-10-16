@@ -1,0 +1,9 @@
+@extends('admin.layout')
+@section('title','الطلبات')
+@section('content')
+<div class="page-heading"><div><p class="eyebrow">من الطلب إلى التسليم</p><h1>الطلبات</h1></div><a class="btn secondary" href="{{ route('admin.kitchen') }}">شاشة التجهيز</a></div>
+<form class="filters" method="get"><input name="q" placeholder="رقم الطلب أو جوال العميل" value="{{ request('q') }}"><select name="status"><option value="">جميع الحالات</option>@foreach($labels as $value=>$label)<option value="{{ $value }}" @selected(request('status')===$value)>{{ $label }}</option>@endforeach</select><select name="branch_id"><option value="">كل الفروع</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected(request('branch_id')==$branch->id)>{{ $branch->name }}</option>@endforeach</select><button class="btn">بحث</button></form>
+<section class="panel table-wrap"><table><thead><tr><th>الطلب</th><th>العميل</th><th>الخدمة</th><th>الحالة</th><th>الدفع</th><th>الإجمالي</th><th></th></tr></thead><tbody>@forelse($orders as $order)<tr><td><small dir="ltr">{{ $order->order_number }}</small><small>{{ $order->created_at->format('m/d H:i') }} · {{ $order->branch->name }}</small></td><td>{{ $order->user->name }}<small dir="ltr">{{ $order->user->phone }}</small></td><td>{{ $order->delivery_type==='pickup'?'استلام':'توصيل' }}</td><td><span class="badge {{ $order->status }}">{{ $labels[$order->status] }}</span></td><td>{{ $order->payment_method==='cash'?'نقدي':'إلكتروني' }}<small>{{ $order->payment_status==='paid'?'مدفوع':'غير مدفوع / مراجعة' }}</small></td><td>{{ $order->total }} ر.س</td><td><a href="{{ route('admin.orders.show',$order) }}">فتح ←</a></td></tr>@empty<tr><td colspan="7" class="empty">لا توجد طلبات مطابقة.</td></tr>@endforelse</tbody></table></section>
+@include('admin.pagination',['records'=>$orders])
+@endsection
+

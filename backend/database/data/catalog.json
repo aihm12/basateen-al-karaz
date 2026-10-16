@@ -1,0 +1,122 @@
+[
+  {
+    "sku": "BK-DEMO-1",
+    "category": "Fruits",
+    "name_ar": "مانجو",
+    "name_en": "Mango",
+    "image": "/images/catalog/mango.png",
+    "description_ar": "حبات مانجو بطعم غني وقوام ناعم، مناسبة للتقديم أو لتحضير العصائر. اختر الوزن ودرجة النضج المفضلة."
+  },
+  {
+    "sku": "BK-DEMO-2",
+    "category": "Vegetables",
+    "name_ar": "طماطم",
+    "name_en": "Tomatoes",
+    "image": "/images/catalog/tomatoes.png",
+    "description_ar": "طماطم للاستخدام اليومي في السلطة والطبخ. تُغسل قبل الاستخدام وتُحفظ في مكان مناسب."
+  },
+  {
+    "sku": "BK-DEMO-3",
+    "category": "Juices",
+    "name_ar": "عصير برتقال",
+    "name_en": "Orange juice",
+    "image": "/images/catalog/orange-juice.png",
+    "description_ar": "عصير برتقال يُحضّر عند الطلب. اختر مستوى السكر المناسب، ويُفضّل تناوله بعد الاستلام مباشرة."
+  },
+  {
+    "sku": "BK-DEMO-4",
+    "category": "Fruit cuts",
+    "name_ar": "بوكس فواكه",
+    "name_en": "Fruit box",
+    "image": "/images/catalog/fruit-box.png",
+    "description_ar": "تشكيلة فواكه مقطعة للضيافة أو الاستمتاع اليومي. التشكيلة قابلة للتغيير حسب المتوفر؛ راجعنا بشأن الحساسية قبل الطلب."
+  },
+  {
+    "sku": "BK-DEMO-5",
+    "category": "Honey",
+    "name_ar": "عسل سدر",
+    "name_en": "Sidr honey",
+    "image": "/images/catalog/honey.png",
+    "description_ar": "عسل سدر في عبوة عملية للتقديم مع الإفطار والمشروبات. يُعتمد المصدر ومواصفات المنتج من المورد قبل البيع."
+  },
+  {
+    "sku": "BK-DEMO-6",
+    "category": "Nuts",
+    "name_ar": "مكسرات مشكلة",
+    "name_en": "Mixed nuts",
+    "image": "/images/catalog/mixed-nuts.png",
+    "description_ar": "تشكيلة لوز وكاجو وفستق للضيافة والوجبات الخفيفة. يحتوي على مكسرات؛ تُعتمد مكونات الخلطة الفعلية قبل الإطلاق."
+  },
+  {
+    "sku": "BK-CHERRY",
+    "category": "Fruits",
+    "name_ar": "كرز أحمر",
+    "name_en": "Red cherries",
+    "image": "/images/catalog/cherries.png",
+    "description_ar": "كرز أحمر للتقديم كوجبة خفيفة أو مع أطباق الفواكه. يُغسل قبل الأكل وتُزال النواة.",
+    "price": 29.95,
+    "variant": "500 جم",
+    "weight": 500,
+    "unit": "g"
+  },
+  {
+    "sku": "BK-STRAWBERRY",
+    "category": "Fruits",
+    "name_ar": "فراولة",
+    "name_en": "Strawberries",
+    "image": "/images/catalog/strawberries.png",
+    "description_ar": "فراولة مناسبة للتقديم والحلويات والعصائر. تُحفظ مبردة وتُغسل قبل التقديم.",
+    "price": 16.95,
+    "variant": "250 جم",
+    "weight": 250,
+    "unit": "g"
+  },
+  {
+    "sku": "BK-APPLE",
+    "category": "Fruits",
+    "name_ar": "تفاح أحمر",
+    "name_en": "Red apples",
+    "image": "/images/catalog/apples.png",
+    "description_ar": "تفاح أحمر للوجبات الخفيفة وصناديق المدرسة والضيافة. اختر الكمية المناسبة لاحتياجك.",
+    "price": 12.95,
+    "variant": "1 كجم",
+    "weight": 1000,
+    "unit": "g"
+  },
+  {
+    "sku": "BK-BANANA",
+    "category": "Fruits",
+    "name_ar": "موز",
+    "name_en": "Bananas",
+    "image": "/images/catalog/bananas.png",
+    "description_ar": "موز مناسب للإفطار والعصائر والوجبات الخفيفة. يُحفظ في مكان جاف بعيدًا عن الشمس.",
+    "price": 7.95,
+    "variant": "1 كجم",
+    "weight": 1000,
+    "unit": "g"
+  },
+  {
+    "sku": "BK-CUCUMBER",
+    "category": "Vegetables",
+    "name_ar": "خيار",
+    "name_en": "Cucumber",
+    "image": "/images/catalog/cucumber.png",
+    "description_ar": "خيار للسلطات والسندويتشات والتقديم اليومي. يُغسل قبل الاستخدام ويُحفظ مبردًا.",
+    "price": 6.95,
+    "variant": "1 كجم",
+    "weight": 1000,
+    "unit": "g"
+  },
+  {
+    "sku": "BK-CARROT",
+    "category": "Vegetables",
+    "name_ar": "جزر",
+    "name_en": "Carrots",
+    "image": "/images/catalog/carrots.png",
+    "description_ar": "جزر مناسب للطبخ والسلطات والعصائر. يُغسل جيدًا قبل التحضير.",
+    "price": 6.5,
+    "variant": "1 كجم",
+    "weight": 1000,
+    "unit": "g"
+  }
+]

@@ -1,0 +1,1 @@
+<form method="post" action="{{ $action }}" class="record-form">@csrf<input type="hidden" name="_form" value="{{ $formKey }}"><div class="form-grid">@include('admin.fields')</div><button class="btn">حفظ التغييرات</button></form>

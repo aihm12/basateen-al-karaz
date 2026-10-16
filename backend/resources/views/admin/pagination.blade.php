@@ -1,0 +1,1 @@
+@if($records->hasPages())<div class="pagination">@if($records->previousPageUrl())<a class="btn secondary" href="{{ $records->previousPageUrl() }}">السابق</a>@endif<span>صفحة {{ $records->currentPage() }} من {{ $records->lastPage() }}</span>@if($records->nextPageUrl())<a class="btn secondary" href="{{ $records->nextPageUrl() }}">التالي</a>@endif</div>@endif
