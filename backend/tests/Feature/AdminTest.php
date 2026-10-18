@@ -8,11 +8,13 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Staff;
 use App\Models\User;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -117,6 +119,35 @@ class AdminTest extends TestCase
         $this->post('/admin/products/'.$product->id.'/variants', ['id' => 2, 'name_ar' => 'x', 'name_en' => 'x', 'sku' => 'wrong', 'price' => 1, 'is_active' => 1])->assertSessionHasErrors('id');
     }
 
+    public function test_failed_catalog_upload_preserves_existing_product(): void
+    {
+        $this->manager();
+        config(['filesystems.catalog_disk' => 'product_images']);
+        $disk = \Mockery::mock(Filesystem::class);
+        $disk->shouldReceive('putFileAs')->once()->andReturn(false);
+        Storage::shouldReceive('disk')->with('product_images')->andReturn($disk);
+        $product = Product::findOrFail(1);
+        $data = $product->only('name_ar', 'name_en', 'sku', 'category_id', 'tax_rate', 'is_active', 'is_featured');
+        $image = UploadedFile::fake()->createWithContent('good.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZ1sAAAAASUVORK5CYII='));
+        $this->post('/admin/products/save/1', [...$data, 'name_ar' => 'Changed name', 'image' => $image])->assertSessionHasErrors('image');
+        $this->assertSame($product->main_image, $product->fresh()->main_image);
+        $this->assertSame($product->name_ar, $product->fresh()->name_ar);
+    }
+
+    public function test_catalog_upload_uses_configured_storage(): void
+    {
+        $this->manager();
+        config(['filesystems.catalog_disk' => 'product_images']);
+        Storage::fake('product_images');
+        $product = Product::findOrFail(1);
+        $data = $product->only('name_ar', 'name_en', 'sku', 'category_id', 'tax_rate', 'is_active', 'is_featured');
+        $image = UploadedFile::fake()->createWithContent('good.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZ1sAAAAASUVORK5CYII='));
+        $this->post('/admin/products/save/1', [...$data, 'image' => $image])->assertSessionHasNoErrors();
+        $files = Storage::disk('product_images')->files('catalog');
+        $this->assertCount(1, $files);
+        $this->assertSame(Storage::disk('product_images')->url($files[0]), $product->fresh()->main_image);
+    }
+
     public function test_upload_rejects_executable_and_publishes_valid_image(): void
     {
         $this->manager();
@@ -195,8 +226,8 @@ class AdminTest extends TestCase
         $manager = $this->manager();
         $this->post('/admin/team/'.$manager->id, ['name' => $manager->name, 'email' => $manager->email, 'role' => 'staff', 'is_active' => 1])->assertSessionHasErrors('role');
         $this->post('/admin/team', ['name' => 'موظف التجهيز', 'email' => 'staff@example.test', 'role' => 'staff', 'is_active' => 1, 'password' => 'StaffPassword123', 'password_confirmation' => 'StaffPassword123'])->assertSessionHasNoErrors();
-        $staff = Staff::where('email','staff@example.test')->firstOrFail();
-        $this->assertTrue(Hash::check('StaffPassword123',$staff->password));
-        $this->assertSame('staff',$staff->role);
+        $staff = Staff::where('email', 'staff@example.test')->firstOrFail();
+        $this->assertTrue(Hash::check('StaffPassword123', $staff->password));
+        $this->assertSame('staff', $staff->role);
     }
 }

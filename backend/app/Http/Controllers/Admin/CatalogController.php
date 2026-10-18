@@ -13,6 +13,7 @@ use App\Models\ProductVariant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -55,8 +56,21 @@ class CatalogController extends Controller
             if ($r->hasFile('image')) {
                 $image = $r->file('image');
                 $name = Str::uuid().'.'.$image->extension();
-                $image->move(public_path('images/uploads'), $name);
-                $path = '/images/uploads/'.$name;
+                $diskName = config('filesystems.catalog_disk');
+                if ($diskName) {
+                    $disk = Storage::disk($diskName);
+                    $stored = $disk->putFileAs('catalog', $image, $name);
+                    if ($stored === false) {
+                        throw ValidationException::withMessages(['image' => 'تعذّر حفظ الصورة. حاول مرة أخرى.']);
+                    }
+                    $path = $disk->url($stored);
+                } else {
+                    if (app()->isProduction()) {
+                        throw ValidationException::withMessages(['image' => 'لم يتم إعداد التخزين الدائم للصور بعد.']);
+                    }
+                    $image->move(public_path('images/uploads'), $name);
+                    $path = '/images/uploads/'.$name;
+                }
                 $product->update(['main_image' => $path]);
                 $product->images()->create(['image_url' => $path, 'sort_order' => $product->images()->count()]);
             }

@@ -15,6 +15,8 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'catalog_disk' => env('CATALOG_FILESYSTEM_DISK', env('APP_ENV') === 'production' ? 'product_images' : null),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
