@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\FirebaseAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\ActiveCustomer;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('auth/send-otp', [AuthController::class, 'send'])->middleware('throttle:otp-send');
 Route::post('auth/verify-otp', [AuthController::class, 'verify'])->middleware('throttle:otp-verify');
+Route::post('auth/firebase', FirebaseAuthController::class)->middleware('throttle:otp-verify');
 Route::middleware('throttle:api')->group(function () {
     Route::get('payment-config', [PaymentController::class, 'config']);
     Route::get('categories', [CatalogController::class, 'categories']);
