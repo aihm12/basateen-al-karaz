@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\FirebaseAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
@@ -23,6 +24,8 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('delivery-slots', [CatalogController::class, 'slots']);
     Route::middleware(['auth:sanctum', ActiveCustomer::class])->group(function () {
         Route::get('me', fn (Request $r) => $r->user());
+        Route::put('device-token', [DeviceTokenController::class, 'store']);
+        Route::delete('device-token', [DeviceTokenController::class, 'destroy']);
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('addresses', [AccountController::class, 'addresses']);
         Route::post('addresses', [AccountController::class, 'addAddress']);
