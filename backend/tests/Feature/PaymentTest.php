@@ -18,6 +18,22 @@ class PaymentTest extends TestCase
 
     protected $seed = true;
 
+    public function test_cloud_test_requires_explicit_opt_in_and_rejects_live_keys(): void
+    {
+        $this->app->instance('env', 'production');
+        config(['payments.enabled' => true, 'payments.secret_key' => 'sk_test_fake', 'payments.allow_cloud_test' => false]);
+        $this->getJson('/api/payment-config')->assertJsonPath('online_enabled', false);
+        config(['payments.allow_cloud_test' => true]);
+        $this->getJson('/api/payment-config')->assertJsonPath('online_enabled', true)->assertJsonPath('mode', 'test');
+        config(['payments.secret_key' => 'sk_live_forbidden']);
+        $this->getJson('/api/payment-config')->assertJsonPath('online_enabled', false);
+    }
+
+    public function test_return_page_does_not_claim_payment_success(): void
+    {
+        $this->get('/payment/return?status=paid')->assertOk()->assertSee('التحقق من نتيجة الدفع')->assertSee('لا يعني تأكيد الدفع');
+    }
+
     private function onlineOrder(): Order
     {
         config(['payments.enabled' => true, 'payments.secret_key' => 'sk_test_fake']);

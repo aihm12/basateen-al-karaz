@@ -8,7 +8,8 @@ class MoyasarGateway
 {
     public function enabled(): bool
     {
-        return config('payments.enabled') && app()->environment(['local', 'testing'])
+        return config('payments.enabled')
+            && (app()->environment(['local', 'testing']) || config('payments.allow_cloud_test'))
             && str_starts_with((string) config('payments.secret_key'), 'sk_test_');
     }
 
