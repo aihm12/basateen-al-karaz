@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\FirebaseAuthController;
+use App\Http\Controllers\NativePaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\ActiveCustomer;
@@ -40,6 +41,8 @@ Route::middleware('throttle:api')->group(function () {
         Route::get('orders', [OrderController::class, 'index']);
         Route::post('orders', [OrderController::class, 'store']);
         Route::get('orders/{id}', [OrderController::class, 'show'])->whereNumber('id');
+        Route::post('orders/{id}/native-payment-session', [NativePaymentController::class, 'session'])->whereNumber('id');
+        Route::post('orders/{id}/native-verify-payment', [NativePaymentController::class, 'verify'])->whereNumber('id');
         Route::post('orders/{id}/payment-session', [PaymentController::class, 'session'])->whereNumber('id');
         Route::post('orders/{id}/verify-payment', [PaymentController::class, 'verify'])->whereNumber('id');
     });

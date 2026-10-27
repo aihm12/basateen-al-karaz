@@ -34,6 +34,27 @@ class PaymentTest extends TestCase
         $this->get('/payment/return?status=paid')->assertOk()->assertSee('التحقق من نتيجة الدفع')->assertSee('لا يعني تأكيد الدفع');
     }
 
+    public function test_native_payment_is_bound_to_order_and_verified_on_server(): void
+    {
+        $order = $this->onlineOrder();
+        config(['payments.publishable_key' => 'pk_test_fake']);
+        Http::preventStrayRequests();
+        $url = '/api/orders/'.$order->id;
+        $session = $this->postJson($url.'/native-payment-session', ['amount' => 1])->assertOk()->assertJsonPath('amount', 1500)->assertJsonMissingPath('secret_key');
+        $id = $session->json('payment_id');
+        $this->postJson($url.'/native-payment-session')->assertJsonPath('payment_id', $id);
+        $this->postJson($url.'/payment-session')->assertStatus(409);
+        $data = ['id' => $id, 'amount' => 1500, 'currency' => 'SAR', 'description' => $order->order_number, 'live' => false, 'status' => 'paid'];
+        Http::fake(['https://api.moyasar.com/v1/payments/'.$id => Http::sequence()->push(array_merge($data, ['amount' => 1]))->push($data)->push($data)]);
+        $this->postJson($url.'/native-verify-payment', ['status' => 'paid'])->assertStatus(409);
+        $this->assertSame('pending', $order->fresh()->payment_status);
+        $this->postJson($url.'/native-verify-payment')->assertJsonPath('data.payment_status', 'paid');
+        $this->postJson($url.'/native-verify-payment')->assertOk();
+        Sanctum::actingAs(User::create(['name' => 'Other native', 'phone' => '+966500000088']));
+        $this->postJson($url.'/native-payment-session')->assertNotFound();
+        $this->postJson($url.'/native-verify-payment')->assertNotFound();
+    }
+
     private function onlineOrder(): Order
     {
         config(['payments.enabled' => true, 'payments.secret_key' => 'sk_test_fake']);
