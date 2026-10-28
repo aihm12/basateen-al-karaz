@@ -36,7 +36,7 @@ class NativePaymentController extends Controller
         $payment = $order->payments()->where('provider', 'moyasar')->firstOrFail();
         abort_unless($order->payment_method === 'moyasar' && $payment->session_state === 'native' && $payment->transaction_id, 409);
         $result = $gateway->request('GET', 'payments/'.rawurlencode($payment->transaction_id));
-        abort_unless(($result['id'] ?? null) === $payment->transaction_id && ($result['amount'] ?? null) === Money::cents($order->total) && ($result['currency'] ?? null) === 'SAR' && ($result['description'] ?? null) === $order->order_number && ($result['live'] ?? null) === false, 409, 'بيانات الدفع لا تطابق الطلب.');
+        abort_unless(($result['id'] ?? null) === $payment->transaction_id && ($result['amount'] ?? null) === Money::cents($order->total) && ($result['currency'] ?? null) === 'SAR' && ($result['description'] ?? null) === $order->order_number && (! array_key_exists('live', $result) || $result['live'] === false), 409, 'بيانات الدفع لا تطابق الطلب.');
         if (($result['status'] ?? null) === 'paid') {
             DB::transaction(function () use ($order, $payment) {
                 $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();

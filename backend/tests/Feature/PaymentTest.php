@@ -44,9 +44,10 @@ class PaymentTest extends TestCase
         $id = $session->json('payment_id');
         $this->postJson($url.'/native-payment-session')->assertJsonPath('payment_id', $id);
         $this->postJson($url.'/payment-session')->assertStatus(409);
-        $data = ['id' => $id, 'amount' => 1500, 'currency' => 'SAR', 'description' => $order->order_number, 'live' => false, 'status' => 'paid'];
-        Http::fake(['https://api.moyasar.com/v1/payments/'.$id => Http::sequence()->push(array_merge($data, ['amount' => 1]))->push($data)->push($data)]);
+        $data = ['id' => $id, 'amount' => 1500, 'currency' => 'SAR', 'description' => $order->order_number, 'status' => 'paid'];
+        Http::fake(['https://api.moyasar.com/v1/payments/'.$id => Http::sequence()->push(array_merge($data, ['amount' => 1]))->push(array_merge($data, ['live' => true]))->push($data)->push($data)]);
         $this->postJson($url.'/native-verify-payment', ['status' => 'paid'])->assertStatus(409);
+        $this->postJson($url.'/native-verify-payment')->assertStatus(409);
         $this->assertSame('pending', $order->fresh()->payment_status);
         $this->postJson($url.'/native-verify-payment')->assertJsonPath('data.payment_status', 'paid');
         $this->postJson($url.'/native-verify-payment')->assertOk();
