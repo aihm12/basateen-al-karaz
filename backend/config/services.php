@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'msegat' => [
+        'username' => env('MSEGAT_USERNAME'),
+        'api_key' => env('MSEGAT_API_KEY'),
+        'sender' => env('MSEGAT_SENDER'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
