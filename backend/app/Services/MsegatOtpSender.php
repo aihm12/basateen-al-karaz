@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\OtpSender;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 final class MsegatOtpSender implements OtpSender
 {
@@ -23,8 +24,28 @@ final class MsegatOtpSender implements OtpSender
                 'msgEncoding' => 'UTF8',
             ]);
         } catch (ConnectionException) {
+            Log::warning('msegat_otp_transport_failed', ['endpoint' => 'sendsms.php']);
             abort(503, 'تعذّر إرسال رمز التحقق. حاول لاحقًا.');
         }
-        abort_unless($response->successful() && in_array((string) $response->json('code'), ['1', 'M0000'], true), 503, 'تعذّر إرسال رمز التحقق. حاول لاحقًا.');
+        $accepted = $response->successful() && in_array((string) $response->json('code'), ['1', 'M0000'], true);
+        if (! $accepted) {
+            // Only diagnostic fields; never log the request or arbitrary response fields.
+            $redact = static function ($value) use ($settings, $phone, $code): ?string {
+                if (! is_scalar($value)) {
+                    return null;
+                }
+                $value = str_replace([$settings['api_key'], $settings['username'], $phone, ltrim($phone, '+'), $code], '[redacted]', (string) $value);
+
+                return mb_substr(preg_replace('/[0-9]{6,}/', '[redacted]', $value), 0, 500);
+            };
+            Log::warning('msegat_otp_rejected', [
+                'endpoint' => 'sendsms.php',
+                'http_status' => $response->status(),
+                'provider_code' => $redact($response->json('code')),
+                'provider_message' => $redact($response->json('message')),
+                'json_response' => is_array($response->json()),
+            ]);
+        }
+        abort_unless($accepted, 503, 'تعذّر إرسال رمز التحقق. حاول لاحقًا.');
     }
 }
