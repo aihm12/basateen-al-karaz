@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'authentica' => [
+        'api_key' => env('AUTHENTICA_API_KEY'),
+        'template_id' => env('AUTHENTICA_TEMPLATE_ID', 1),
+    ],
     'msegat' => [
         'username' => env('MSEGAT_USERNAME'),
         'api_key' => env('MSEGAT_API_KEY'),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\OtpSender;
 use App\Models\OtpChallenge;
 use App\Models\User;
+use App\Services\AuthenticaOtpSender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +18,7 @@ class AuthController extends Controller
         $d = $r->validate(['phone' => ['required', 'regex:/^\+9665[0-9]{8}$/']]);
         $code = (string) random_int(100000, 999999);
         $sender->send($d['phone'], $code);
-        OtpChallenge::updateOrCreate(['phone' => $d['phone']], ['code_hash' => Hash::make($code), 'attempts' => 0, 'expires_at' => now()->addMinutes(config('store.otp_ttl')), 'consumed_at' => null]);
+        OtpChallenge::updateOrCreate(['phone' => $d['phone']], ['provider' => config('store.otp_driver'), 'code_hash' => Hash::make($code), 'attempts' => 0, 'expires_at' => now()->addMinutes(config('store.otp_ttl')), 'consumed_at' => null]);
         $result = ['message' => 'OTP requested', 'expires_in' => 300];
         if (app()->environment(['local', 'testing']) && config('store.otp_driver') === 'local') {
             $result['development_code'] = $code;
@@ -35,7 +36,17 @@ class AuthController extends Controller
                 return null;
             }
             $otp->increment('attempts');
-            if (! Hash::check($d['code'], $otp->code_hash)) {
+            // Reject challenges issued before switching providers; request a fresh code.
+            if ($otp->provider !== null && $otp->provider !== config('store.otp_driver')) {
+                return null;
+            }
+            if (config('store.otp_driver') === 'authentica' && $otp->provider !== 'authentica') {
+                return null;
+            }
+            $valid = $otp->provider === 'authentica'
+                ? app(AuthenticaOtpSender::class)->verify($d['phone'], $d['code'])
+                : Hash::check($d['code'], $otp->code_hash);
+            if (! $valid) {
                 return null;
             }
             $user = User::firstOrCreate(['phone' => $d['phone']], ['name' => $d['name'] ?? 'عميل بساتين الكرز', 'phone_verified_at' => now()]);

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\OtpSender;
 use App\Models\Notification;
 use App\Observers\NotificationObserver;
+use App\Services\AuthenticaOtpSender;
 use App\Services\LocalOtpSender;
 use App\Services\MsegatOtpSender;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -16,7 +17,11 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(OtpSender::class, fn () => config('store.otp_driver') === 'msegat' ? new MsegatOtpSender : new LocalOtpSender);
+        $this->app->bind(OtpSender::class, fn () => match (config('store.otp_driver')) {
+            'authentica' => new AuthenticaOtpSender,
+            'msegat' => new MsegatOtpSender,
+            default => new LocalOtpSender,
+        });
     }
 
     public function boot(): void
